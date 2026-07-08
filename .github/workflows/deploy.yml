@@ -21,10 +21,7 @@ jobs:
           node-version: 18
 
       - name: Install & Build Frontend
-        run: |
-          cd frontend
-          npm install
-          npm run build
+        run: cd frontend && npm install && npm run build
         env:
           NODE_ENV: production
 
