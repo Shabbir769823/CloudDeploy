@@ -1,0 +1,6 @@
+﻿# Normalize line endings
+* text=auto
+
+# Enforce Unix LF line endings for workflow configuration files
+.github/workflows/*.yml text eol=lf
+.github/workflows/*.yaml text eol=lf
