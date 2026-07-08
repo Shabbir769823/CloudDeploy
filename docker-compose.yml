@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  # Express backend REST server & Socket logger
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: clouddeploy-backend-service
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - JWT_SECRET=clouddeploy_secret_key_12345
+      - DB_PATH=/database/clouddeploy.db
+    volumes:
+      # Persistent database volume
+      - ./database:/database
+      # Cloned code repositories volume
+      - ./uploads:/uploads
+      # Mount Host Docker Daemon to allow container-in-container builds
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  # React development dashboard server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: clouddeploy-frontend-service
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    restart: always
+
+  # Nginx Gateway Proxy Router
+  nginx:
+    image: nginx:alpine
+    container_name: clouddeploy-nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    restart: always
+
+  # Prometheus analytics scraper
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: clouddeploy-prometheus-monitor
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    restart: always
