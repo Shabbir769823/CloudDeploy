@@ -22,8 +22,6 @@ jobs:
 
       - name: Install & Build Frontend
         run: cd frontend && npm install && npm run build
-        env:
-          NODE_ENV: production
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
